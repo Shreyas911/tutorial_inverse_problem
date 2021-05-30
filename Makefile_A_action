@@ -1,0 +1,32 @@
+EXEC := A_action
+SRC  := $(wildcard *.f90)
+OBJ  := $(patsubst %.f90, %.o, $(SRC))
+# NOTE - OBJ will not have the object files of c codes in it, this needs to be improved upon.
+# Options	
+F90 	:= gfortran
+CC 		:= gcc
+POP_PUSH:= ./pop_push
+
+# Rules
+
+$(EXEC): adStack.o forward_d.o driver_A.o
+		$(F90) -o $@ $^
+
+%.o: %.f90 
+		$(F90) -c $<
+
+driver_A.o: forward_d.f90 forward_tgt.mod
+forward_tgt.mod: forward_d.o 
+
+adStack.o : 
+		$(CC) -c $(POP_PUSH)/adStack.c
+
+
+forward_d.f90: forward.f90
+		tapenade -tangent -tgtmodulename %_tgt -head "forward_problem_hessian_action(h_capital_final)/(M0,M1)" forward.f90
+# Useful phony targets
+
+.PHONY: clean
+
+clean:
+	$(RM) $(EXEC) *.o $(MOD) $(MSG) *.msg *.mod *_db.f90 *_b.f90 *_d.f90 *~
