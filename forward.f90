@@ -2,7 +2,7 @@ module forward
 
 implicit none
 	real(8), parameter :: xend = 30
-	real(8), parameter :: dx = 1
+	real(8), parameter :: dx = 1.0
 	integer, parameter :: nx = int(xend/dx)
 
 
