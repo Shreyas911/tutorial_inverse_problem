@@ -3,3 +3,5 @@ A_action
 AT_action
 forward
 *.mod
+.*
+fort.2
