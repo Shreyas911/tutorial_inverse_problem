@@ -8,7 +8,7 @@ implicit none
 
 contains
 
-	subroutine forward_problem(M0,M1,J)
+	subroutine forward_problem(M,b,J)
 
 		implicit none
 
@@ -19,27 +19,19 @@ contains
 		real(8), parameter :: dt = 1/12.0
 		real(8), parameter :: C = 2*A/(n+2)*(rho*g)**n*(1.e3)**n
 		real(8), parameter :: tend = 5000
-		real(8), parameter :: bx = -0.0001
 		integer, parameter :: nt = int(tend/dt)
 		real(8), dimension(nx+1,nt+1) :: h
 		real(8), dimension(nx+1,nt+1) :: h_capital
 		integer :: t,i
 		real(8), dimension(nx+1) :: xarr 
-		real(8), dimension(nx+1) :: M 
-		real(8), dimension(nx+1) :: b 
+		real(8), dimension(nx+1), intent(in) :: M 
+		real(8), dimension(nx+1), intent(in) :: b 
 		real(8), dimension(nx) :: D, phi
-		real(8), intent(in) :: M0, M1
 		real(8), intent(out) :: J
 		real(8), dimension(nx+1) :: h_capital_true
 
 		xarr = (/ ((i-1)*dx, i=1,nx+1) /)
 		
-		!M = (/ (M0-(i-1)*dx*M1, i=1,nx+1) /)
-		do i=1,nx+1
-			M(i) = M0 - (i-1)*dx*M1
-		end do
-
-		b = (/ (1.0+bx*(i-1)*dx, i=1,nx+1) /)
 		h(1,:) = b(1)
 		h(:,1) = b
 		h(nx+1,:) = b(nx+1)
@@ -72,18 +64,16 @@ contains
    		open (100, file = 'true_data.txt', status = 'old')
 		do i = 1, size(h_capital(:,nt+1))
 			read(100,*) h_capital_true(i)
-			J = J + (h_capital(i,nt+1)-h_capital_true(i))**2
+			J = J + (h_capital(i,nt+1)-h_capital_true(i))**2 + 100*(M(i) - 0.001)**2 + 100*(b(i) - 1.0)**2
+
 			write(2,*) i, "    ", h_capital(i,nt+1), "    ", h(i,nt+1), "    ", b(i)
        		end do
-
-
-	J = J + 100*((M0-0.001)**2 + (M1-0.0001)**2)
  
    	close(100)
 	close(2)
 	end subroutine forward_problem
 
-	subroutine forward_problem_hessian_action(M0,M1,h_capital_final)
+	subroutine forward_problem_hessian_action(M,b,h_capital_final)
 
 
 		implicit none
@@ -95,27 +85,20 @@ contains
 		real(8), parameter :: dt = 1/12.0
 		real(8), parameter :: C = 2*A/(n+2)*(rho*g)**n*(1.e3)**n
 		real(8), parameter :: tend = 5000
-		real(8), parameter :: bx = -0.0001
 		integer, parameter :: nt = int(tend/dt)
 		real(8), dimension(nx+1,nt+1) :: h
 		real(8), dimension(nx+1,nt+1) :: h_capital
 		real(8), dimension(nx+1), intent(out) :: h_capital_final
 		integer :: t,i
 		real(8), dimension(nx+1) :: xarr 
-		real(8), dimension(nx+1) :: M 
-		real(8), dimension(nx+1) :: b 
+		real(8), dimension(nx+1), intent(in) :: M 
+		real(8), dimension(nx+1), intent(in) :: b 
 		real(8), dimension(nx) :: D, phi
-		real(8), intent(in) :: M0, M1
 		real(8), dimension(nx+1) :: h_capital_true
 
 		xarr = (/ ((i-1)*dx, i=1,nx+1) /)
 		
-		!M = (/ (M0-(i-1)*dx*M1, i=1,nx+1) /)
-		do i=1,nx+1
-			M(i) = M0 - (i-1)*dx*M1
-		end do
 
-		b = (/ (1.0+bx*(i-1)*dx, i=1,nx+1) /)
 		h(1,:) = b(1)
 		h(:,1) = b
 		h(nx+1,:) = b(nx+1)

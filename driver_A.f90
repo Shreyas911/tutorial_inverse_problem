@@ -4,24 +4,37 @@ program driver_A
 
 	implicit none 
 
-	real(8) :: M0, M1, M0d = 0., M1d = 0.
+	real(8), dimension(n+1) :: M, b, Md = 0., bd = 0.
 	real(8), dimension(n+1) :: h_capital_final = 0., h_capital_finald = 0.
 	integer :: ii
 
 	! opening the state file for reading
         open (99, file = 'state.txt', status = 'old')
-	read(99,*) M0
-	read(99,*) M1
+	do ii = 1, n+1
+		read(99,*) M(ii)
+	end do
+	do ii = 1, n+1
+		read(99,*) b(ii)
+	end do
+
 	close(99)
+	
         !! Tangent Linear Model
 
 
         open (100, file = 'direction_A_action.txt', status = 'old')
-        read(100,*) M0d
-        read(100,*) M1d
+        
+	do ii = 1, n+1
+		read(100,*) Md(ii)
+	end do
+
+	do ii = 1, n+1
+        	read(100,*) bd(ii)
+	end do
 	close(100)
+	
         !! TLM
-        call forward_problem_hessian_action_d(M0,M0d,M1,M1d,h_capital_final,h_capital_finald)
+        call forward_problem_hessian_action_d(M,Md,b,bd,h_capital_final,h_capital_finald)
 
 
 	open (unit = 1, file = "A_action.txt", action="write",status="replace")      

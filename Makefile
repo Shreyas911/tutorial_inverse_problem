@@ -22,7 +22,7 @@ adStack.o :
 		$(CC) -c $(POP_PUSH)/adStack.c
 
 forward_b.f90: forward.f90 forward.o
-		tapenade -reverse -head "forward_problem(J)/(M0, M1)" forward.f90
+		tapenade -reverse -head "forward_problem(J)/(M, b)" forward.f90
 # Useful phony targets
 
 .PHONY: clean

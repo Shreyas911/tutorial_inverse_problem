@@ -23,7 +23,7 @@ adStack.o :
 
 
 forward_b.f90: forward.f90
-		tapenade -reverse -head "forward_problem_hessian_action(h_capital_final)/(M0,M1)" forward.f90
+		tapenade -reverse -head "forward_problem_hessian_action(h_capital_final)/(M,b)" forward.f90
 # Useful phony targets
 
 .PHONY: clean

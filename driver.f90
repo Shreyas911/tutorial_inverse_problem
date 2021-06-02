@@ -4,24 +4,36 @@ program driver
 
 	implicit none 
 
-	real(8) :: M0, M1, M0b =0., M1b = 0.
+	real(8), dimension(n+1) :: M, Mb =0., b, bb = 0.
 	real(8) :: J=0., Jb = 1.
-
+	integer :: i
 	! opening the state file for reading
         open (99, file = 'state.txt', status = 'old')
-	read(99,*) M0
-	read(99,*) M1
+	do i = 1, n+1
+		read(99,*) M(i)
+	end do
+	do i = 1, n+1
+		read(99,*) b(i)
+	end do
+	close(99)
 
-	call forward_problem_b(M0,M0b,M1,M1b,J,Jb)
+	call forward_problem_b(M,Mb,b,bb,J,Jb)
 
-	open (unit = 1, file = "gradient.txt", action="write",status="replace")
-	write(1,*) M0b
-	write(1,*) M1b
-	close(1)
+	open (unit = 0, file = "gradient.txt", action="write",status="replace")
+	open (unit = 2, file = "loss.txt", action="write",status="replace")
 
-	call fp(M0,M1,J)
-        open (unit = 2, file = "loss.txt", action="write",status="replace")
+	do i = 1, n+1
+		write(0,*) Mb(i)
+	end do
+	do i = 1, n+1
+                write(0,*) bb(i)
+        end do
+
+	call fp(M,b,J)
         write(2,*) J
-        close(2)
+
+	close(0)
+	close(1)
+	close(2)
 end program driver
 

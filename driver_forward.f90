@@ -4,15 +4,20 @@ program driver_forward
 
 	implicit none 
 
-	real(8) :: M0, M1
+	real(8), dimension(n+1) :: M, b
 	real(8) :: J=0.
+	integer :: i
 
 	! opening the state file for reading
         open (99, file = 'state.txt', status = 'old')
-	read(99,*) M0
-	read(99,*) M1
+	do i = 1, n+1
+		read(99,*) M(i)
+	end do
+	do i = 1, n+1
+                read(99,*) b(i)
+        end do
 
-	call fp(M0,M1,J)
+	call fp(M,b,J)
         open (unit = 2, file = "loss_inexact_line_search.txt", action="write",status="replace")
         write(2,*) J
         close(2)
